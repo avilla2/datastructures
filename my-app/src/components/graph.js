@@ -1,14 +1,20 @@
 import React from 'react';
+import { makeStyles } from '@material-ui/core/styles';
 import Node from './node'
 
-const Tree = (props) => {
+const useStyles = makeStyles(() => ({
+    root: {
+        margin: "0 auto",
+        width: "fit-content",
+    },
+  }));
 
+const Tree = (props) => {
+    const classes = useStyles();
     return (
-        <div>
-            {props.nodes.map((node, index) => (
-                <div key={index}>
-                    <Node value={node.value} />
-                </div>
+        <div className={classes.root}>
+            {props.nodes.map((node) => (
+                <Node key={node.key} value={node.value} offset={node.offset} color={node.color === "red" ? "secondary" : "default" }/>
             ))}
         </div>
     );

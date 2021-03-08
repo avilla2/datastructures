@@ -1,4 +1,4 @@
-import React, { useState} from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListSubheader from '@material-ui/core/ListSubheader';
@@ -15,14 +15,16 @@ import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
+import Grid from '@material-ui/core/Grid';
 import Tree from './graph'
+import RBTree from '../api/redBlack'
 
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
     maxWidth: 360,
     backgroundColor: theme.palette.background.paper,
-    margin: "20px 0 0 20px",
+    margin: "20px 0 0 40px",
   },
   text: {
     '& > *': {
@@ -51,6 +53,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
+var mytree = new RBTree();
 
 export default function MainMenu() {
   const classes = useStyles();
@@ -59,7 +62,7 @@ export default function MainMenu() {
   const [openArray, setOpenArray] = useState(false);
   const [list, setList] = useState([])
   const [insertValue, setInsertValue] = useState("")
-  const [change, setChange] = useState(false)
+  const [rbTree, setTree] = useState(mytree)
 
   const handleClick = () => {
     setOpen(!open);
@@ -73,101 +76,106 @@ export default function MainMenu() {
   };
 
   const addNode = () => {
-    var newNode = {value: insertValue, parent: null, left: null, right: null, side: null }
-    list.push(newNode);
-    setList(list);
-    setChange(!change);
-    console.log(list);
+    rbTree.insert(parseInt(insertValue, 10));
+    setTree(rbTree);
+    let new_list = rbTree.traverse();
+    setList(new_list);
+    setInsertValue("")
   };
 
   const handleTextChange = (event) => {
     setInsertValue(event.target.value);
   }
 
-
   return (
-    <div className={classes.root}>
-    <Paper elevation={3}>
-        <List component="nav" aria-label="main menu" subheader={
-            <ListSubheader component="div" id="nested-list-subheader">
-                Red Black Tree Visualizer
-            </ListSubheader>
-        }>
-        <ListItem button onClick={handleClick}>
-            <ListItemIcon>
-                <AddIcon />
-            </ListItemIcon>
-            <ListItemText primary="Insert Node" />
-                {open ? <ExpandLess /> : <ExpandMore />}
-            </ListItem>
-            <Collapse in={open} timeout="auto" unmountOnExit>
-                <List component="div" disablePadding>
-                    <ListItem className={classes.nested}>
-                    <form className={classes.nodeEntry} noValidate autoComplete="off">
-                            <div className={classes.text}>
-                                <TextField id="insert-node-value" label="Node Value" variant="outlined" size="small"  value={insertValue} onChange={handleTextChange}/>
-                            </div>
-                            <div className={classes.btn}>
-                                <Button onClick={addNode} type="submit" variant="contained" color="primary">
-                                    Insert
-                                </Button>
-                            </div>
-                        </form>
+    <Grid container className={classes.base} spacing={2}>
+        <Grid item xs={4}>
+            <div className={classes.root}>
+                <Paper elevation={3}>
+                    <List component="nav" aria-label="main menu" subheader={
+                        <ListSubheader component="div" id="nested-list-subheader">
+                            Red Black Tree Visualizer
+                        </ListSubheader>
+                    }>
+                    <ListItem button onClick={handleClick}>
+                        <ListItemIcon>
+                            <AddIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Insert Node" />
+                            {open ? <ExpandLess /> : <ExpandMore />}
+                        </ListItem>
+                        <Collapse in={open} timeout="auto" unmountOnExit>
+                            <List component="div" disablePadding>
+                                <ListItem className={classes.nested}>
+                                <form className={classes.nodeEntry} noValidate autoComplete="off">
+                                        <div className={classes.text}>
+                                            <TextField id="insert-node-value" label="Node Value" variant="outlined" size="small"  value={insertValue} onChange={handleTextChange}/>
+                                        </div>
+                                        <div className={classes.btn}>
+                                            <Button onClick={addNode} variant="contained" color="primary">
+                                                Insert
+                                            </Button>
+                                        </div>
+                                    </form>
+                                </ListItem>
+                            </List>
+                        </Collapse>
+                        <ListItem button onClick={handleFind}>
+                            <ListItemIcon>
+                                <SearchIcon />
+                            </ListItemIcon>
+                            <ListItemText primary="Find Node" />
+                                {openFind ? <ExpandLess /> : <ExpandMore />}
+                            </ListItem>
+                        <Collapse in={openFind} timeout="auto" unmountOnExit>
+                            <List component="div" disablePadding>
+                                <ListItem className={classes.nested}>
+                                    <form className={classes.nodeEntry} noValidate autoComplete="off">
+                                        <div className={classes.text}>
+                                            <TextField id="find-node-value" label="Node Value" variant="outlined" size="small" />
+                                        </div>
+                                        <div className={classes.btn}>
+                                            <Button variant="contained" color="primary">
+                                                Insert
+                                            </Button>
+                                        </div>
+                                    </form>
+                                </ListItem>
+                            </List>
+                        </Collapse>
+                    </List>
+                  <Divider />
+                  <List component="nav" aria-label="tools">
+                    <ListItem button>
+                      <ListItemText primary="Get Minimum" />
                     </ListItem>
-                </List>
-            </Collapse>
-            <ListItem button onClick={handleFind}>
-                <ListItemIcon>
-                    <SearchIcon />
-                </ListItemIcon>
-                <ListItemText primary="Find Node" />
-                    {openFind ? <ExpandLess /> : <ExpandMore />}
-                </ListItem>
-            <Collapse in={openFind} timeout="auto" unmountOnExit>
-                <List component="div" disablePadding>
-                    <ListItem className={classes.nested}>
-                        <form className={classes.nodeEntry} noValidate autoComplete="off">
-                            <div className={classes.text}>
-                                <TextField id="find-node-value" label="Node Value" variant="outlined" size="small" />
-                            </div>
-                            <div className={classes.btn}>
-                                <Button variant="contained" color="primary">
-                                    Insert
-                                </Button>
-                            </div>
-                        </form>
+                    <ListItem button>
+                      <ListItemText primary="Get Maximum" />
                     </ListItem>
-                </List>
-            </Collapse>
-        </List>
-      <Divider />
-      <List component="nav" aria-label="tools">
-        <ListItem button>
-          <ListItemText primary="Get Minimum" />
-        </ListItem>
-        <ListItem button>
-          <ListItemText primary="Get Maximum" />
-        </ListItem>
-        <ListItem button onClick={handleArray}>
-          <ListItemText primary="To Array" />
-          {openArray ? <ExpandLess /> : <ExpandMore />}
-        </ListItem>
-        <Collapse in={openArray} timeout="auto" unmountOnExit>
-                <List component="div" disablePadding>
-                    <ListItem className={classes.nested}>
-                        <div className={classes.btnGroup}>
-                            <ButtonGroup size="small" color="primary" variant="contained" aria-label="outlined primary button group">
-                                <Button>Preorder</Button>
-                                <Button>Inorder</Button>
-                                <Button>Postorder</Button>
-                            </ButtonGroup>
-                        </div>
+                    <ListItem button onClick={handleArray}>
+                      <ListItemText primary="To Array" />
+                      {openArray ? <ExpandLess /> : <ExpandMore />}
                     </ListItem>
-                </List>
-            </Collapse>
-      </List>
-    </Paper>
-    <Tree nodes={list} />
-    </div>
+                    <Collapse in={openArray} timeout="auto" unmountOnExit>
+                            <List component="div" disablePadding>
+                                <ListItem className={classes.nested}>
+                                    <div className={classes.btnGroup}>
+                                        <ButtonGroup size="small" color="primary" variant="contained" aria-label="outlined primary button group">
+                                            <Button>Preorder</Button>
+                                            <Button>Inorder</Button>
+                                            <Button>Postorder</Button>
+                                        </ButtonGroup>
+                                    </div>
+                                </ListItem>
+                            </List>
+                        </Collapse>
+                  </List>
+                </Paper>
+            </div>
+        </Grid>
+        <Grid item xs={8}>
+            <Tree nodes={list} />
+        </Grid>
+    </Grid>
   );
 }
